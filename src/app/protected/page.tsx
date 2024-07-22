@@ -5,14 +5,12 @@ import { onAuthStateChanged, signOut, User } from "firebase/auth";
 
 function ProtectedPage() {
   const [user, setUser] = useState<User | null>(null);
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
       }
     });
-
     return () => unsubscribe(); // Cleanup function to prevent memory leaks
   }, []);
 
@@ -25,7 +23,6 @@ function ProtectedPage() {
       // Handle sign out errors (e.g., display error message)
     }
   };
-
   return (
     <div className="flex flex-col items-center pt-12 pb-16 px-4">
       {user ? (
@@ -35,7 +32,6 @@ function ProtectedPage() {
             <div className="flex flex-col space-y-4 items-center">
               <p className="text-lg font-medium">Hello, {user.displayName}!</p>
               <p className="text-base">Email: {user.email}</p>
-              <p className="text-base">Phone: {user.phoneNumber}</p>
               <p className="text-base">UID: {user.uid}</p>
               <p className="text-base">
                 Logged in using: {user.providerData[0].providerId}
