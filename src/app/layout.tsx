@@ -7,7 +7,7 @@ import NavbarComponent from "@/components/navbar";
 const myFont = localFont({ src: "../../public/Poppins.ttf" });
 
 export const metadata: Metadata = {
-  title: "TripScript",
+  title: "TripScriptt",
   description: "One stop destination for all your travel needs",
 };
 
