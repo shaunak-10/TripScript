@@ -3,6 +3,7 @@ import "./globals.css";
 import localFont from "next/font/local";
 import { Providers } from "./providers";
 import NavbarComponent from "@/components/navbar";
+import Footer from "@/components/Footer";
 
 const myFont = localFont({ src: "../../public/Poppins.ttf" });
 
@@ -22,6 +23,7 @@ export default function RootLayout({
         <Providers>
           <NavbarComponent />
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>
