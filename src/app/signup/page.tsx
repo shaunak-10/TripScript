@@ -11,6 +11,12 @@ import MessageBox from "@/components/messagebox";
 import { Input, Button } from "@nextui-org/react";
 import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "@/components/icons/EyeSlashFilledIcon";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 
 function SignupPage() {
   const [name, setName] = useState("");
@@ -21,12 +27,41 @@ function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isFormLoading, setIsFormLoading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
+
+  const handleFileChange = (event: any) => {
+    const selectedFile = event.target.files[0];
+    const maxSize = 5 * 1024 * 1024;
+
+    if (selectedFile && selectedFile.size <= maxSize) {
+      setFile(selectedFile);
+    } else {
+      setError("File size must be less than 5MB");
+      event.target.value = "";
+    }
+  };
+
+  const handleUpload = async (uid: string) => {
+    if (!file) {
+      return;
+    }
+    const storage = getStorage();
+    const storageRef = ref(storage, `profilePictures/${uid}`);
+    try {
+      await uploadBytesResumable(storageRef, file);
+    } catch (error) {
+      setError("Failed to upload profile picture");
+    }
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  };
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
     setIsFormLoading(true);
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -44,14 +79,16 @@ function SignupPage() {
         email,
         password
       );
+      const imageURL = await handleUpload(userCredential.user.uid);
       const updatedUser = {
         ...userCredential.user,
-        photoURL: "https://cdn-icons-png.flaticon.com/256/59/59170.png",
+        photoURL: imageURL,
         displayName: name,
       };
 
       await updateProfile(userCredential.user, updatedUser);
       await sendEmailVerification(userCredential.user);
+
       await signOut(auth);
       setSuccessMessage(
         "Please check your email to verify your account, then login."
@@ -113,6 +150,13 @@ function SignupPage() {
           label="Confirm Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+        <Input
+          type="file"
+          id="profile-picture"
+          label="Profile Picture"
+          accept="image/*"
+          onChange={handleFileChange}
         />
         <Button
           type="submit"
