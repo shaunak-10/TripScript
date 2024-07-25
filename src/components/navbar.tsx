@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -20,6 +19,9 @@ export default function NavbarComponent() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
+      }
+      if (!currentUser) {
+        setUser(null);
       }
     });
 
@@ -71,11 +73,14 @@ export default function NavbarComponent() {
         <NavbarContent justify="end">
           <Avatar
             as="button"
-            className="transition-transform hover:scale-110 ring-2 ring-primary ring-offset-2"
-            color="secondary"
+            className="transition-transform hover:scale-110"
             name={user.displayName ? user.displayName : "User"}
             size="sm"
-            src={user.photoURL ? user.photoURL : "https://i.pravatar.cc/300"}
+            src={
+              user.photoURL
+                ? user.photoURL
+                : "https://cdn-icons-png.flaticon.com/256/59/59170.png"
+            }
           />
         </NavbarContent>
       )}
