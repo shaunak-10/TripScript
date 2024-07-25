@@ -23,10 +23,10 @@ export function FlipWordsDemo() {
           className="text-blue-600 dark:text-blue-400 font-bold ml-2"
         />
       </div>
-      <p className="text-xl text-gray-600 dark:text-gray-400 max-w-md">
+      {/* <p className="text-xl text-gray-600 dark:text-gray-400 max-w-md">
         Your intelligent companion, from itinerary creation to real-time
         recommendations
-      </p>
+      </p> */}
       <Button color="primary" className="mt-4 px-6 py-3 w-fit">
         Plan Your Adventure
       </Button>

@@ -32,6 +32,7 @@ function SignupPage() {
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   const handleFileChange = (event: any) => {
+    setError(null);
     const selectedFile = event.target.files[0];
     const maxSize = 5 * 1024 * 1024;
 
@@ -151,13 +152,26 @@ function SignupPage() {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
-        <Input
-          type="file"
-          id="profile-picture"
-          label="Profile Picture"
-          accept="image/*"
-          onChange={handleFileChange}
-        />
+        <div className="flex items-center">
+          <input
+            type="file"
+            id="profile-picture"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <Button
+            as="label"
+            htmlFor="profile-picture"
+            color="primary"
+            variant="flat"
+          >
+            Choose Profile Picture
+          </Button>
+          <span className="ml-3 text-sm text-gray-500">
+            {file ? file.name : "No file chosen"}
+          </span>
+        </div>
         <Button
           type="submit"
           className="w-full inline-flex items-center px-4 py-2"
