@@ -8,6 +8,10 @@ import {
   Link,
   Button,
   Avatar,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Divider,
 } from "@nextui-org/react";
 import { auth } from "@/firebase";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
@@ -71,17 +75,46 @@ export default function NavbarComponent() {
         </NavbarContent>
       ) : (
         <NavbarContent justify="end">
-          <Avatar
-            as="button"
-            className="transition-transform hover:scale-110"
-            name={user.displayName ? user.displayName : "User"}
-            size="sm"
-            src={
-              user.photoURL
-                ? user.photoURL
-                : "https://cdn-icons-png.flaticon.com/256/59/59170.png"
-            }
-          />
+          <Popover>
+            <PopoverTrigger>
+              <Avatar
+                as="button"
+                className="transition-transform hover:scale-110"
+                name={user.displayName ? user.displayName : "User"}
+                size="md"
+                src={
+                  user.photoURL
+                    ? user.photoURL
+                    : "https://cdn-icons-png.flaticon.com/256/59/59170.png"
+                }
+              />
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="flex m-4">
+                <Avatar
+                  src={
+                    user.photoURL
+                      ? user.photoURL
+                      : "https://cdn-icons-png.flaticon.com/256/59/59170.png"
+                  }
+                  size="lg"
+                  color="secondary"
+                />
+                <div className="flex flex-col ml-4">
+                  <p className="text-lg font-bold">{user.displayName}</p>
+                  <p className="text-sm">{user.email}</p>
+                </div>
+              </div>
+              <Divider />
+              <Button
+                className="w-full m-4"
+                color="danger"
+                onClick={async () => await signOut(auth)}
+              >
+                Sign Out
+              </Button>
+            </PopoverContent>
+          </Popover>
         </NavbarContent>
       )}
     </Navbar>
