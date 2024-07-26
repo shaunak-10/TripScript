@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth, googleProvider } from "@/firebase"; // Import from firebase.ts
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
   sendPasswordResetEmail,
+  onAuthStateChanged,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import MessageBox from "@/components/messagebox";
@@ -22,6 +23,15 @@ function LoginPage() {
   const [isFormLoading, setIsFormLoading] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/");
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 

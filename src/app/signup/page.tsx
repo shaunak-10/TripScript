@@ -1,13 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth } from "@/firebase"; // Import from firebase.ts
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   updateProfile,
   signOut,
+  onAuthStateChanged,
 } from "firebase/auth";
 import MessageBox from "@/components/messagebox";
+import { useRouter } from "next/navigation";
 import { Input, Button } from "@nextui-org/react";
 import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "@/components/icons/EyeSlashFilledIcon";
@@ -19,6 +21,7 @@ import {
 } from "firebase/storage";
 
 function SignupPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,8 +32,16 @@ function SignupPage() {
   const [isFormLoading, setIsFormLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
 
-  const toggleVisibility = () => setIsVisible(!isVisible);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/");
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
 
+  const toggleVisibility = () => setIsVisible(!isVisible);
   const handleFileChange = (event: any) => {
     setError(null);
     const selectedFile = event.target.files[0];
