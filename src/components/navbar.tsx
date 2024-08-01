@@ -29,6 +29,8 @@ export default function NavbarComponent() {
   const [error, setError] = useState<string | null>(null);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
+  console.log(user);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {

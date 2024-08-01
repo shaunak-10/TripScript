@@ -25,13 +25,14 @@ function parseResponse(responseText: string) {
   // Extract the JSON string
   const jsonString = responseText.substring(jsonStart, jsonEnd);
 
+  console.log(jsonString);
+
   // Parse the JSON string into an object
   let tripItineraryJson;
   try {
     tripItineraryJson = JSON.parse(jsonString);
   } catch (error) {
     console.error("Error parsing JSON:", error);
-    console.log("Problematic JSON string:", jsonString);
     return null;
   }
 
