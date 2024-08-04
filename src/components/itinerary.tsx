@@ -46,7 +46,7 @@ const Itinerary = ({ trip }: { trip: Trip }) => {
             {day.activities.map((activity, index) => (
               <div
                 key={index}
-                className="bg-gradient-to-br from-blue-100 to-green-100 rounded-xl shadow-lg overflow-hidden flex flex-col transform transition-all duration-300 hover:scale-105"
+                className="bg-gradient-to-br from-blue-50 to-green-50 rounded-xl shadow-lg overflow-hidden flex flex-col transform transition-all duration-300 hover:scale-105"
               >
                 <div className="p-6 flex-grow">
                   <h3 className="text-2xl font-bold mb-4 text-blue-800">

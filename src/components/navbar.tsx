@@ -63,12 +63,15 @@ export default function NavbarComponent() {
   };
 
   return (
-    <Navbar position="static" className="shadow-md">
+    <Navbar
+      position="static"
+      className="bg-gradient-to-r from-blue-50 to-green-50 shadow-lg py-2"
+    >
       <NavbarBrand>
         <Link
           color="foreground"
           href="/"
-          className="font-bold text-xl hover:opacity-80 transition-opacity"
+          className="font-bold text-2xl text-blue-800 hover:text-blue-600 transition-colors duration-200"
         >
           TripScript
         </Link>
@@ -79,7 +82,7 @@ export default function NavbarComponent() {
             <Link
               color="foreground"
               href="#"
-              className="text-sm font-medium hover:underline transition-all"
+              className="text-md font-medium text-gray-600 hover:text-blue-800 hover:underline transition-all duration-300"
             >
               {item}
             </Link>
