@@ -86,13 +86,6 @@ export default function TripPreferences() {
     //Now navigate to /your-trip with all data
     router.push(
       `/your-trip?destination=${destination}&days=${days}&budget=${budget}&theme=${theme}`
-      // "/your-trip",
-      // query=>{
-      //   query.destination=destination
-      //   query.days=days
-      //   query.budget=budget
-      //   query.theme=theme
-      // }
     );
   }
   return (
