@@ -22,7 +22,7 @@ export default function RootLayout({
       <body className={myFont.className}>
         <Providers>
           <NavbarComponent />
-          {children}
+          <div className="min-h-screen h-auto">{children}</div>
           <Footer />
         </Providers>
       </body>
