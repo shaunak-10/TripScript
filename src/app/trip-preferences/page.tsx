@@ -1,7 +1,9 @@
 "use client";
 
 import { Input, Button, Select, SelectItem } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 const themes = [
   {
     key: 1,
@@ -73,6 +75,7 @@ function getLabelsFromKeys(selectedKeys: number[]) {
 }
 
 export default function TripPreferences() {
+  const router = useRouter();
   const [destination, setDestination] = useState("");
   const [days, setDays] = useState("");
   const [budget, setBudget] = useState("");
@@ -81,6 +84,16 @@ export default function TripPreferences() {
     event.preventDefault();
     console.log("Form submitted:", { destination, days, budget, theme });
     //Now navigate to /your-trip with all data
+    router.push(
+      `/your-trip?destination=${destination}&days=${days}&budget=${budget}&theme=${theme}`
+      // "/your-trip",
+      // query=>{
+      //   query.destination=destination
+      //   query.days=days
+      //   query.budget=budget
+      //   query.theme=theme
+      // }
+    );
   }
   return (
     <div className="flex flex-col items-center min-h-screen py-12 px-4">
