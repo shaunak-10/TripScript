@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Itinerary from "@/components/itinerary";
 import type { Trip } from "@/components/itinerary";
 import Loading from "./loading";
+import MessageBox from "@/components/messagebox";
 export default function YourTrip({
   searchParams,
 }: {
@@ -22,7 +23,7 @@ export default function YourTrip({
   useEffect(() => {
     const fetchItinerary = async () => {
       try {
-        const prompt = `Please create a detailed day-wise itinerary in JSON format for a ${days}-day trip to ${destination} with a budget of Rs. ${budget}. Include accommodations, transportation, activities based on ${theme}, Camping options. Provide descriptions, costs, and durations for each component. Convert all costs to INR (Rs) for an overall budget estimate.`;
+        const prompt = `Please create a detailed day-wise itinerary in JSON format for a ${days}-day trip to ${destination} with a budget of Rs. ${budget}. Include accommodations, transportation, activities based on ${theme} options. Provide descriptions, costs, and durations for each component. Convert all costs to INR (Rs) for an overall budget estimate.`;
 
         const response = await fetch("/api/get-itinerary", {
           method: "POST",
@@ -33,7 +34,7 @@ export default function YourTrip({
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch itinerary");
+          setError("Failed to fetch itinerary");
         }
 
         const data: Trip = await response.json();
@@ -47,11 +48,15 @@ export default function YourTrip({
   }, [destination, days, budget, theme]);
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="container mx-auto px-4 py-8 h-full">
+        <MessageBox message={error} type="error" />
+      </div>
+    );
   }
 
   if (!trip) {
-    return Loading(); 
+    return Loading();
   }
 
   return <Itinerary trip={trip} />;

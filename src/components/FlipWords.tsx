@@ -1,9 +1,12 @@
+"use client";
 import React from "react";
 import { FlipWords } from "@/uistuff/flip-words";
 import { Button } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 
 export function FlipWordsDemo() {
   const words = ["smarter", "easier", "personalized", "unforgettable"];
+  const router = useRouter();
 
   return (
     <div className="flex flex-col justify-center h-full space-y-6">
@@ -27,7 +30,11 @@ export function FlipWordsDemo() {
         Your intelligent companion, from itinerary creation to real-time
         recommendations
       </p> */}
-      <Button color="primary" className="mt-4 px-6 py-3 w-fit">
+      <Button
+        color="primary"
+        className="mt-4 px-6 py-3 w-fit"
+        onClick={() => router.push("/trip-preferences")}
+      >
         Plan Your Adventure
       </Button>
     </div>

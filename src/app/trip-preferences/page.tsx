@@ -80,13 +80,16 @@ export default function TripPreferences() {
   const [days, setDays] = useState("");
   const [budget, setBudget] = useState("");
   const [theme, setTheme] = useState("");
+  const [buttonLoading, setButtonLoading] = useState(false);
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setButtonLoading(true);
     console.log("Form submitted:", { destination, days, budget, theme });
     //Now navigate to /your-trip with all data
     router.push(
       `/your-trip?destination=${destination}&days=${days}&budget=${budget}&theme=${theme}`
     );
+    setButtonLoading(false);
   }
   return (
     <div className="flex flex-col items-center min-h-screen py-12 px-4">
@@ -139,6 +142,7 @@ export default function TripPreferences() {
           type="submit"
           className="w-full inline-flex items-center px-4 py-2"
           color="primary"
+          isLoading={buttonLoading}
         >
           Get Itinerary
         </Button>
