@@ -61,7 +61,7 @@ const CityPage: React.FC = () => {
       </h1>
       {loading && <p>Loading images...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-4 ">
         {images.map((image) => (
           <div
             key={image.id}
@@ -79,8 +79,6 @@ const CityPage: React.FC = () => {
           </div>
         ))}
       </div>
-
-      
     </div>
   );
 };
