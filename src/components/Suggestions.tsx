@@ -1,6 +1,9 @@
+"use client";
 import React from "react";
 import { Card, CardFooter, Image } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { StaticImageData } from "next/image";
+import Link from "next/link";
 
 interface SuggestionCardProps {
   city: string;
@@ -8,6 +11,8 @@ interface SuggestionCardProps {
 }
 
 export default function Suggestions(props: SuggestionCardProps) {
+  const router = useRouter();
+
   return (
     <Card
       isBlurred
@@ -17,12 +22,13 @@ export default function Suggestions(props: SuggestionCardProps) {
       <Image
         alt={`Image of ${props.city}`}
         className="object-cover rounded-lg transition-all duration-300 group-hover:opacity-50"
-        src={props.image.src}
+        src={props.image.src} // Display the static image
         height={300}
         width={300}
       />
-      <CardFooter
-        className="
+      <Link href={`/city?q=${props.city}`}>
+        <CardFooter
+          className="
           text-white 
           text-center 
           absolute 
@@ -45,20 +51,20 @@ export default function Suggestions(props: SuggestionCardProps) {
           group-hover:bg-black/50
           z-10
         "
-      >
-        <span
-          className="
+        >
+          <span
+            className="
           transition-all
           duration-500
           transform
           group-hover:scale-110
           mb-2
         "
-        >
-          {props.city}
-        </span>
-        <span
-          className="
+          >
+            {props.city}
+          </span>
+          <span
+            className="
           opacity-0
           transition-all
           duration-500
@@ -68,10 +74,11 @@ export default function Suggestions(props: SuggestionCardProps) {
           group-hover:translate-y-0
           text-sm
         "
-        >
-          Let's go {"->"}
-        </span>
-      </CardFooter>
+          >
+            Let's go {"->"}
+          </span>
+        </CardFooter>
+      </Link>
     </Card>
   );
 }
