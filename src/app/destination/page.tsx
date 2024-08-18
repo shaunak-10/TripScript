@@ -59,7 +59,7 @@ interface Overview {
   };
 }
 
-const XYZPage: React.FC = () => {
+const DestinationPage: React.FC = () => {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -90,156 +90,154 @@ const XYZPage: React.FC = () => {
     fetchOverview();
   }, []);
 
-  //   if (error) {
-  //     return (
-  //       <div className="container mx-auto px-4 py-8 h-full">
-  //         <MessageBox message={error} type="error" />
-  //       </div>
-  //     );
-  //   }
-
   if (!overview) {
     return <p>Loading...</p>;
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Discover {overview.city}</h1>
+      <h1 className="text-4xl font-extrabold text-center mb-12 text-blue-800 tracking-tight">
+        Discover {overview.city}
+      </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Best Time to Visit</h2>
-          <p>{overview.best_time_to_visit.description}</p>
-          <ul className="mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Best Time to Visit */}
+        <div className="bg-blue-50 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Best Time to Visit</h2>
+          <p className="text-gray-700 mb-4">{overview.best_time_to_visit.description}</p>
+          <ul className="list-disc list-inside">
             {overview.best_time_to_visit.seasons.map((season, index) => (
               <li key={index} className="mb-3">
-                <h3 className="font-semibold">{season.season}</h3>
-                <p>{season.description}</p>
+                <span className="font-semibold text-blue-500">{season.season}:</span>
+                <span className="text-gray-600"> {season.description}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Local Customs and Culture
-          </h2>
-          <p>
-            <strong>Greetings:</strong>{" "}
-            {overview.local_customs_and_culture.greetings}
-          </p>
-          <p>
-            <strong>Etiquette:</strong>{" "}
-            {overview.local_customs_and_culture.etiquette}
-          </p>
-          <p>
-            <strong>Dress Code:</strong>{" "}
-            {overview.local_customs_and_culture.dress_code}
-          </p>
-          <p>
-            <strong>Food and Drink:</strong>{" "}
-            {overview.local_customs_and_culture.food_and_drink}
-          </p>
-          <p>
-            <strong>Religious Practices:</strong>{" "}
-            {overview.local_customs_and_culture.religious_practices}
-          </p>
+        {/* Local Customs and Culture */}
+        <div className="bg-green-50 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-green-600">Local Customs and Culture</h2>
+          <ul className="list-disc list-inside">
+            <li className="mb-2">
+              <span className="font-semibold text-green-500">Greetings:</span>
+              <span className="text-gray-600"> {overview.local_customs_and_culture.greetings}</span>
+            </li>
+            <li className="mb-2">
+              <span className="font-semibold text-green-500">Etiquette:</span>
+              <span className="text-gray-600"> {overview.local_customs_and_culture.etiquette}</span>
+            </li>
+            <li className="mb-2">
+              <span className="font-semibold text-green-500">Dress Code:</span>
+              <span className="text-gray-600"> {overview.local_customs_and_culture.dress_code}</span>
+            </li>
+            <li className="mb-2">
+              <span className="font-semibold text-green-500">Food and Drink:</span>
+              <span className="text-gray-600"> {overview.local_customs_and_culture.food_and_drink}</span>
+            </li>
+            <li className="mb-2">
+              <span className="font-semibold text-green-500">Religious Practices:</span>
+              <span className="text-gray-600"> {overview.local_customs_and_culture.religious_practices}</span>
+            </li>
+          </ul>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Safety Tips</h2>
-          <p>
-            <strong>General:</strong> {overview.safety_tips.general}
-          </p>
-          <p>
-            <strong>Crime:</strong> {overview.safety_tips.crime}
-          </p>
-          <p>
-            <strong>Traffic:</strong> {overview.safety_tips.traffic}
-          </p>
-          <p>
-            <strong>Health:</strong> {overview.safety_tips.health}
-          </p>
-          <p>
-            <strong>Emergency Numbers:</strong>{" "}
-            {overview.safety_tips.emergency_numbers}
-          </p>
+        {/* Safety Tips */}
+        <div className="bg-red-50 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-red-600">Safety Tips</h2>
+          <ul className="list-disc list-inside">
+            <li className="mb-2">
+              <span className="font-semibold text-red-500">General:</span>
+              <span className="text-gray-600"> {overview.safety_tips.general}</span>
+            </li>
+            <li className="mb-2">
+              <span className="font-semibold text-red-500">Crime:</span>
+              <span className="text-gray-600"> {overview.safety_tips.crime}</span>
+            </li>
+            <li className="mb-2">
+              <span className="font-semibold text-red-500">Traffic:</span>
+              <span className="text-gray-600"> {overview.safety_tips.traffic}</span>
+            </li>
+            <li className="mb-2">
+              <span className="font-semibold text-red-500">Health:</span>
+              <span className="text-gray-600"> {overview.safety_tips.health}</span>
+            </li>
+            <li className="mb-2">
+              <span className="font-semibold text-red-500">Emergency Numbers:</span>
+              <span className="text-gray-600"> {overview.safety_tips.emergency_numbers}</span>
+            </li>
+          </ul>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Transportation</h2>
-          <ul>
+        {/* Transportation */}
+        <div className="bg-purple-50 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-purple-600">Transportation</h2>
+          <ul className="list-disc list-inside">
             {overview.transportation.options.map((option, index) => (
-              <li key={index} className="mb-3">
-                <strong>{option.mode}:</strong> {option.description}
+              <li key={index} className="mb-2">
+                <span className="font-semibold text-purple-500">{option.mode}:</span>
+                <span className="text-gray-600"> {option.description}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Landmarks and Attractions
-          </h2>
-          <h3 className="text-lg font-semibold mt-4">Popular Landmarks</h3>
-          <ul>
-            {overview.landmarks_and_attractions.popular_landmarks.map(
-              (landmark, index) => (
-                <li key={index} className="mb-3">
-                  <strong>{landmark.name}:</strong> {landmark.description}
-                </li>
-              )
-            )}
+        {/* Landmarks and Attractions */}
+        <div className="bg-indigo-50 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-indigo-600">Landmarks and Attractions</h2>
+          <h3 className="text-xl font-semibold mt-4 text-indigo-500">Popular Landmarks</h3>
+          <ul className="list-disc list-inside">
+            {overview.landmarks_and_attractions.popular_landmarks.map((landmark, index) => (
+              <li key={index} className="mb-2">
+                <span className="font-semibold text-indigo-400">{landmark.name}:</span>
+                <span className="text-gray-600"> {landmark.description}</span>
+              </li>
+            ))}
           </ul>
-          <h3 className="text-lg font-semibold mt-4">Other Attractions</h3>
-          <ul>
-            {overview.landmarks_and_attractions.other_attractions.map(
-              (attraction, index) => (
-                <li key={index} className="mb-3">
-                  <strong>{attraction.name}:</strong> {attraction.description}
-                </li>
-              )
-            )}
+          <h3 className="text-xl font-semibold mt-4 text-indigo-500">Other Attractions</h3>
+          <ul className="list-disc list-inside">
+            {overview.landmarks_and_attractions.other_attractions.map((attraction, index) => (
+              <li key={index} className="mb-2">
+                <span className="font-semibold text-indigo-400">{attraction.name}:</span>
+                <span className="text-gray-600"> {attraction.description}</span>
+              </li>
+            ))}
           </ul>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Cultural Experiences</h2>
-          <h3 className="text-lg font-semibold mt-4">Unique Activities</h3>
-          <ul>
-            {overview.cultural_experiences.unique_activities.map(
-              (activity, index) => (
-                <li key={index} className="mb-3">
-                  <strong>{activity.activity}:</strong> {activity.description}
-                </li>
-              )
-            )}
+        {/* Cultural Experiences */}
+        <div className="bg-teal-50 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-teal-600">Cultural Experiences</h2>
+          <h3 className="text-xl font-semibold mt-4 text-teal-500">Unique Activities</h3>
+          <ul className="list-disc list-inside">
+            {overview.cultural_experiences.unique_activities.map((activity, index) => (
+              <li key={index} className="mb-2">
+                <span className="font-semibold text-teal-400">{activity.activity}:</span>
+                <span className="text-gray-600"> {activity.description}</span>
+              </li>
+            ))}
           </ul>
-          <h3 className="text-lg font-semibold mt-4">Events and Festivals</h3>
-          <ul>
-            {overview.cultural_experiences.events_and_festivals.map(
-              (event, index) => (
-                <li key={index} className="mb-3">
-                  <strong>{event.event}:</strong> {event.description}
-                </li>
-              )
-            )}
+          <h3 className="text-xl font-semibold mt-4 text-teal-500">Events and Festivals</h3>
+          <ul className="list-disc list-inside">
+            {overview.cultural_experiences.events_and_festivals.map((event, index) => (
+              <li key={index} className="mb-2">
+                <span className="font-semibold text-teal-400">{event.event}:</span>
+                <span className="text-gray-600"> {event.description}</span>
+              </li>
+            ))}
           </ul>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Day Trips and Excursions
-          </h2>
-          <ul>
-            {overview.day_trips_and_excursions.destinations.map(
-              (destination, index) => (
-                <li key={index} className="mb-3">
-                  <strong>{destination.destination}:</strong>{" "}
-                  {destination.description}
-                </li>
-              )
-            )}
+        {/* Day Trips and Excursions */}
+        <div className="bg-gray-50 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Day Trips and Excursions</h2>
+          <ul className="list-disc list-inside">
+            {overview.day_trips_and_excursions.destinations.map((destination, index) => (
+              <li key={index} className="mb-2">
+                <span className="font-semibold text-gray-600">{destination.destination}:</span>
+                <span className="text-gray-600"> {destination.description}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -247,4 +245,4 @@ const XYZPage: React.FC = () => {
   );
 };
 
-export default XYZPage;
+export default DestinationPage;

@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     //                 Unique cultural experiences and activities that tourists should not miss.
     //                 Any recommended day trips or excursions from ${city}.
     //         Please return the information in a well-structured JSON format.`;
-    const prompt = `Make me a same output as before for ${city}`;
+    const prompt = `Make me a same output as before for ${city} information should be very concisely and in JSON format.`;
     const overview = await destinationDiscovery(prompt);
 
     return NextResponse.json(overview);
