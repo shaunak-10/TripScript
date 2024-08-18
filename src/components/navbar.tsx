@@ -18,31 +18,100 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Input,
 } from "@nextui-org/react";
 import { auth } from "@/firebase";
 import { onAuthStateChanged, signOut, User, deleteUser } from "firebase/auth";
 import MessageBox from "@/components/messagebox";
+import SearchIcon from "@mui/icons-material/Search";
+import { useRouter } from "next/navigation";
 
 export default function NavbarComponent() {
   const [user, setUser] = useState<User | null>(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [error, setError] = useState<string | null>(null);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
+  const placeholders = [
+    "New York",
+    "Los Angeles",
+    "Chicago",
+    "Houston",
+    "Phoenix",
+    "Philadelphia",
+    "San Antonio",
+    "San Diego",
+    "Dallas",
+    "San Jose",
+    "Toronto",
+    "Vancouver",
+    "Montreal",
+    "Paris",
+    "London",
+    "Berlin",
+    "Madrid",
+    "Rome",
+    "Amsterdam",
+    "Vienna",
+    "Sydney",
+    "Melbourne",
+    "Tokyo",
+    "Osaka",
+    "Seoul",
+    "Hong Kong",
+    "Shanghai",
+    "Beijing",
+    "Singapore",
+    "Bangkok",
+    "Mumbai",
+    "Delhi",
+    "Istanbul",
+    "Dubai",
+    "Jeddah",
+    "Cairo",
+    "Lagos",
+    "Nairobi",
+    "Buenos Aires",
+    "Sao Paulo",
+    "Rio de Janeiro",
+    "Lima",
+    "Bogota",
+    "Santiago",
+    "Mexico City",
+    "Toronto",
+    "San Salvador",
+    "Guatemala City",
+    "Managua",
+    "Havana",
+  ];
 
-  console.log(user);
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-      }
-      if (!currentUser) {
+      } else {
         setUser(null);
       }
     });
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length);
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [placeholders.length]);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    router.push(`/destination?city=${searchTerm}`);
+  };
 
   const handleDelete = async () => {
     setIsDeleteLoading(true);
@@ -76,18 +145,18 @@ export default function NavbarComponent() {
           TripScript
         </Link>
       </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-6" justify="center">
-        {["Features", "Customers", "Integrations"].map((item) => (
-          <NavbarItem key={item}>
-            <Link
-              color="foreground"
-              href="#"
-              className="text-md font-medium text-gray-600 hover:text-blue-800 hover:underline transition-all duration-300"
-            >
-              {item}
-            </Link>
-          </NavbarItem>
-        ))}
+      <NavbarContent>
+        <NavbarItem className="w-full">
+          <form onSubmit={handleSubmit}>
+            <Input
+              placeholder={placeholders[currentPlaceholder]}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              endContent={<SearchIcon />}
+              color="primary"
+            />
+          </form>
+        </NavbarItem>
       </NavbarContent>
 
       {!user ? (
@@ -136,7 +205,7 @@ export default function NavbarComponent() {
                   <p className="text-lg font-bold">{user.displayName}</p>
                   <p className="text-md">{user.email}</p>
                   <p className="text-sm text-gray-500">
-                    member since{" "}
+                    Member since{" "}
                     {user.metadata.creationTime
                       ? new Date(user.metadata.creationTime).toLocaleDateString(
                           "en-US",

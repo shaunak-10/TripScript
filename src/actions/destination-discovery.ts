@@ -215,7 +215,6 @@ Json`,
       },
     ],
   });
-  console.log("Destination Discovery prompt:", prompt);
   const result = await chatSession.sendMessage(prompt);
   return JSON.parse(result.response.text());
 }

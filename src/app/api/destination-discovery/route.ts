@@ -4,7 +4,6 @@ import { destinationDiscovery } from "@/actions/destination-discovery";
 export async function POST(request: NextRequest) {
   try {
     const { city } = await request.json();
-    console.log("City is:", city);
     if (!city) {
       return NextResponse.json(
         { error: "City name is required" },

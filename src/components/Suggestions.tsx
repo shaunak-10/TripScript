@@ -26,7 +26,7 @@ export default function Suggestions(props: SuggestionCardProps) {
         height={300}
         width={300}
       />
-      <Link href={`/city?q=${props.city}`}>
+      <Link href={`/destination?city=${props.city}`}>
         <CardFooter
           className="
           text-white 
