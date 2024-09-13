@@ -1,17 +1,20 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth } from "@/firebase"; // Import from firebase.ts
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { db } from "@/firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
-function ProtectedPage() {
+function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
       }
     });
-    return () => unsubscribe(); // Cleanup function to prevent memory leaks
+    return () => unsubscribe();
   }, []);
 
   const handleSignOut = async () => {
@@ -23,33 +26,51 @@ function ProtectedPage() {
       // Handle sign out errors (e.g., display error message)
     }
   };
+
+  const getItineraries = async () => {
+    const itinerariesRef = collection(db, "itineraries");
+    const itineraries = await getDocs(
+      query(itinerariesRef, where("userId", "==", user?.uid))
+    );
+    if (itineraries.empty) {
+      console.log("No itineraries found");
+    } else {
+      itineraries.forEach((doc) => {
+        console.log(doc.data().trip);
+      });
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center pt-12 pb-16 px-4">
+    <div className="bg-white p-8">
       {user ? (
         user.emailVerified ? (
-          <>
-            <h1 className="text-3xl font-bold mb-8">Protected Page</h1>
-            <div className="flex flex-col space-y-4 items-center">
-              <p className="text-lg font-medium">Hello, {user.displayName}!</p>
-              <p className="text-base">Email: {user.email}</p>
-              <p className="text-base">UID: {user.uid}</p>
-              <p className="text-base">
-                Logged in using: {user.providerData[0].providerId}
-              </p>
-              <img
-                className="w-24 h-24 rounded-full mb-4"
-                src={user.photoURL ?? "https://via.placeholder.com/150"}
-                alt="User Profile"
-              />
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Sign Out
-              </button>
-            </div>
-          </>
+          <div className="flex flex-col items-center justify-center">
+            <img
+              className="w-48 h-48 rounded-full mb-4"
+              src={user.photoURL || "https://via.placeholder.com/150"}
+              alt="User Profile"
+            />
+            <h1 className="text-3xl font-bold mb-2">{user.displayName}</h1>
+            <p className="text-lg mb-4">{user.email}</p>
+            <p className="text-lg mb-4">UID: {user.uid}</p>
+            <p className="text-lg mb-4">
+              Logged in using: {user.providerData[0].providerId}
+            </p>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+            >
+              Sign Out
+            </button>
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 mt-5"
+              onClick={getItineraries}
+            >
+              your itineraries
+            </button>
+          </div>
         ) : (
           <p className="text-lg font-medium">Email not verified</p>
         )
@@ -62,4 +83,4 @@ function ProtectedPage() {
   );
 }
 
-export default ProtectedPage;
+export default ProfilePage;
