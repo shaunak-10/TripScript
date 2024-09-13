@@ -111,7 +111,7 @@ const DestinationPage: React.FC = () => {
         const response = await fetch(
           `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
             city
-          )}&per_page=8`,
+          )} Tourist Attractions&per_page=8`,
           {
             headers: {
               Authorization: `Client-ID ${accessKey}`,
