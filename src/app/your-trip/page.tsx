@@ -5,6 +5,12 @@ import Itinerary from "@/components/itinerary";
 import type { Trip } from "@/components/itinerary";
 import Loading from "./loading";
 import MessageBox from "@/components/messagebox";
+import { Button } from "@nextui-org/react";
+import { db, auth } from "@/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { useRouter } from "next/navigation";
+
 export default function YourTrip({
   searchParams,
 }: {
@@ -17,6 +23,9 @@ export default function YourTrip({
 }) {
   const [trip, setTrip] = useState<Trip | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const router = useRouter();
 
   const { destination, days, budget, theme } = searchParams;
 
@@ -43,9 +52,36 @@ export default function YourTrip({
         setError(err instanceof Error ? err.message : "An error occurred");
       }
     };
-
     fetchItinerary();
   }, [destination, days, budget, theme]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  async function addItineraryToFirestore(trip: Trip) {
+    setIsSaving(true);
+    if (!user) {
+      setError("You must be logged in to save an itinerary.");
+      router.push("/login");
+    }
+    try {
+      const docRef = await addDoc(collection(db, "itineraries"), {
+        trip,
+        userId: user?.uid,
+      });
+      console.log("Document written with ID: ", docRef.id);
+      router.push("/protected");
+    } catch (error) {
+      setError("Failed to save itinerary");
+      if (error instanceof Error) {
+        console.error("Error adding document: ", error.message);
+      }
+    }
+  }
 
   if (error) {
     return (
@@ -59,5 +95,23 @@ export default function YourTrip({
     return Loading();
   }
 
-  return <Itinerary trip={trip} />;
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="bg-white rounded-lg shadow-md">
+        <div className="p-6">
+          <Itinerary trip={trip} />
+        </div>
+        <div className="bg-gray-50 px-6 py-4 flex justify-end items-center">
+          <Button
+            isLoading={isSaving}
+            color="primary"
+            onClick={() => addItineraryToFirestore(trip)}
+            className="px-6 py-2 text-white font-semibold rounded-full transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            {user ? "Save Itinerary" : "Log in to Save Itinerary"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
