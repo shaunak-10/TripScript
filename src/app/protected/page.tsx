@@ -4,6 +4,14 @@ import { auth } from "@/firebase"; // Import from firebase.ts
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { db } from "@/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Avatar,
+  Button,
+} from "@nextui-org/react";
 
 function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -45,41 +53,60 @@ function ProfilePage() {
     <div className="bg-white p-8">
       {user ? (
         user.emailVerified ? (
-          <div className="flex flex-col items-center justify-center">
-            <img
-              className="w-48 h-48 rounded-full mb-4"
-              src={user.photoURL || "https://via.placeholder.com/150"}
-              alt="User Profile"
-            />
-            <h1 className="text-3xl font-bold mb-2">{user.displayName}</h1>
-            <p className="text-lg mb-4">{user.email}</p>
-            <p className="text-lg mb-4">UID: {user.uid}</p>
-            <p className="text-lg mb-4">
-              Logged in using: {user.providerData[0].providerId}
-            </p>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-            >
-              Sign Out
-            </button>
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 mt-5"
-              onClick={getItineraries}
-            >
-              your itineraries
-            </button>
-          </div>
+          <Card className="max-w-fit">
+            <CardHeader className="justify-center">
+              <div className="flex gap-5">
+                <Avatar
+                  isBordered
+                  radius="full"
+                  className=" w-30 h-30"
+                  src={
+                    user
+                      ? user.photoURL
+                        ? user.photoURL
+                        : "https://via.placeholder.com/150"
+                      : "https://via.placeholder.com/150"
+                  }
+                />
+                <div className="flex flex-col gap-1 items-center justify-center">
+                  <h4 className="text-large font-semibold leading-none text-default-800">
+                    {user?.displayName}
+                  </h4>
+                  <h5 className="text-small tracking-tight text-default-400">
+                    {user?.email}
+                  </h5>
+                </div>
+                {/*
+              icon div
+            */}
+                <div className="flex flex-col gap-1 items-center justify-center">
+                  {user.providerData[0].providerId === "google.com" && (
+                    <img
+                      src="https://img.icons8.com/color/48/000000/google-logo.png"
+                      alt="Google Logo"
+                      className="w-6 h-6 mr-2"
+                    />
+                  )}{" "}
+                </div>
+              </div>
+            </CardHeader>
+            <CardFooter className="justify-center space-x-4">
+              <Button className="bg-red-500" onClick={handleSignOut}>
+                Logout
+              </Button>
+              <Button className="bg-slate-500" onClick={getItineraries}>
+                Your itineraries
+              </Button>
+            </CardFooter>
+          </Card>
         ) : (
           <p className="text-lg font-medium">Email not verified</p>
         )
       ) : (
-        <p className="text-lg font-medium">
-          You are not logged in. Please log in first.
-        </p>
+        <p> Please login to see your profile</p>
       )}
     </div>
+    // Ui content
   );
 }
 
