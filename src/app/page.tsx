@@ -2,9 +2,9 @@
 import { Globe } from "@/components/globe";
 import { FlipWordsDemo } from "@/components/FlipWords";
 import InfoCard from "@/components/card";
-import compass from "../../public/images/compass.jpeg";
-import plane from "../../public/images/plane.jpeg";
-import diary from "../../public/images/diary.jpeg";
+import compass from "../../public/images/compass.jpg";
+import plane from "../../public/images/plane.jpg";
+import diary from "../../public/images/diary.jpg";
 import Suggestions from "@/components/Suggestions";
 import uk from "../../public/images/UK.jpg";
 import tokyo from "../../public/images/TOKYO.jpg";

@@ -222,6 +222,14 @@ export default function NavbarComponent() {
               <Divider />
               <div className="m-4 w-full flex flex-col gap-2">
                 <Button
+                  color="primary"
+                  variant="flat"
+                  className="w-full"
+                  onClick={() => router.push("/protected")}
+                >
+                  Go to Profile
+                </Button>
+                <Button
                   color="danger"
                   variant="flat"
                   className="w-full"
