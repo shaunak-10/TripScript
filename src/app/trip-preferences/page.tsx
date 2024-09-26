@@ -81,13 +81,14 @@ export default function TripPreferences() {
   const [budget, setBudget] = useState("");
   const [theme, setTheme] = useState("");
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [people, setPeople] = useState(1);
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setButtonLoading(true);
     console.log("Form submitted:", { destination, days, budget, theme });
     //Now navigate to /your-trip with all data
     router.push(
-      `/your-trip?destination=${destination}&days=${days}&budget=${budget}&theme=${theme}`
+      `/your-trip?destination=${destination}&days=${days}&budget=${budget}&theme=${theme}&people=${people}`
     );
     setButtonLoading(false);
   }
@@ -113,6 +114,13 @@ export default function TripPreferences() {
           label="How long?"
           value={days}
           onChange={(e) => setDays(e.target.value)}
+        />
+        <Input
+          type="number"
+          id="people"
+          label="Number of people"
+          value={people.toString()}
+          onChange={(e) => setPeople(parseInt(e.target.value))}
         />
         <Input
           type="number"

@@ -104,14 +104,26 @@ const DestinationPage: React.FC = () => {
         setError(err instanceof Error ? err.message : "An error occurred");
       }
     };
-
+    const generateQuery = (city: string) => {
+      const touristKeywords = [
+        "landmarks",
+        "attractions",
+        "sightseeing",
+        "tourism",
+        "travel destination",
+      ];
+      const randomKeyword =
+        touristKeywords[Math.floor(Math.random() * touristKeywords.length)];
+      return `${city} ${randomKeyword}`;
+    };
     const fetchImages = async () => {
       setLoading(true);
       try {
+        const query = generateQuery(city);
         const response = await fetch(
           `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
-            city
-          )} Tourist Attractions&per_page=8`,
+            query
+          )}&per_page=8&content_filter=high&orientation=landscape`,
           {
             headers: {
               Authorization: `Client-ID ${accessKey}`,

@@ -19,6 +19,7 @@ export default function YourTrip({
     days: string;
     budget: string;
     theme: string;
+    people: string;
   };
 }) {
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -27,12 +28,12 @@ export default function YourTrip({
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
-  const { destination, days, budget, theme } = searchParams;
+  const { destination, days, budget, theme, people } = searchParams;
 
   useEffect(() => {
     const fetchItinerary = async () => {
       try {
-        const prompt = `Please create a detailed day-wise itinerary in JSON format for a ${days}-day trip to ${destination} with a budget of Rs. ${budget}. Include accommodations, transportation, activities based on ${theme} options. Provide descriptions, costs, and durations for each component. Convert all costs to INR (Rs) for an overall budget estimate.`;
+        const prompt = `Please create a detailed day-wise itinerary in JSON format for a ${days}-day trip to ${destination} with total budget of Rs. ${budget} for ${people} people  . Include accommodations, transportation, activities based on ${theme} options. Provide descriptions, costs, and durations for each component. Convert all costs to INR (Rs) for an overall budget estimate.`;
 
         const response = await fetch("/api/get-itinerary", {
           method: "POST",
