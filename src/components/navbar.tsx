@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import img from "../../public/images/Logo-2.png";
 import {
   Navbar,
   NavbarBrand,
@@ -142,7 +143,7 @@ export default function NavbarComponent() {
           href="/"
           className="font-bold text-2xl text-blue-800 hover:text-blue-600 transition-colors duration-200"
         >
-          TripScript
+          <img src={img.src} alt="Logo" width={180} height={180} />
         </Link>
       </NavbarBrand>
       <NavbarContent>

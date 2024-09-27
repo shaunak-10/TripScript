@@ -161,7 +161,7 @@ const DestinationPage: React.FC = () => {
           Discover {overview.city}
         </h1>
         {loading && <p>Loading images...</p>}
-        {error && <MessageBox type="error" message={error} />}
+        {/* {error && <MessageBox type="error" message={error} />} */}
         <div className="grid grid-cols-12 gap-4">
           {images.slice(0, 3).map((image, index) => (
             <div
@@ -206,7 +206,7 @@ const DestinationPage: React.FC = () => {
               {overview.best_time_to_visit.description}
             </p>
             <ul className="list-disc list-inside">
-              {overview.best_time_to_visit.seasons.map((season, index) => (
+              {overview?.best_time_to_visit.seasons?.map((season, index) => (
                 <li key={index} className="mb-3">
                   <span className="font-semibold text-blue-500">
                     {season.season}:
@@ -227,14 +227,14 @@ const DestinationPage: React.FC = () => {
                 <span className="font-semibold text-green-500">Greetings:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.local_customs_and_culture.greetings}
+                  {overview?.local_customs_and_culture.greetings}
                 </span>
               </li>
               <li className="mb-2">
                 <span className="font-semibold text-green-500">Etiquette:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.local_customs_and_culture.etiquette}
+                  {overview.local_customs_and_culture?.etiquette}
                 </span>
               </li>
               <li className="mb-2">
@@ -243,7 +243,7 @@ const DestinationPage: React.FC = () => {
                 </span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.local_customs_and_culture.dress_code}
+                  {overview.local_customs_and_culture?.dress_code}
                 </span>
               </li>
               <li className="mb-2">
@@ -252,7 +252,7 @@ const DestinationPage: React.FC = () => {
                 </span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.local_customs_and_culture.food_and_drink}
+                  {overview.local_customs_and_culture?.food_and_drink}
                 </span>
               </li>
               <li className="mb-2">
@@ -261,7 +261,7 @@ const DestinationPage: React.FC = () => {
                 </span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.local_customs_and_culture.religious_practices}
+                  {overview.local_customs_and_culture?.religious_practices}
                 </span>
               </li>
             </ul>
@@ -277,28 +277,28 @@ const DestinationPage: React.FC = () => {
                 <span className="font-semibold text-red-500">General:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips.general}
+                  {overview.safety_tips?.general}
                 </span>
               </li>
               <li className="mb-2">
                 <span className="font-semibold text-red-500">Crime:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips.crime}
+                  {overview.safety_tips?.crime}
                 </span>
               </li>
               <li className="mb-2">
                 <span className="font-semibold text-red-500">Traffic:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips.traffic}
+                  {overview.safety_tips?.traffic}
                 </span>
               </li>
               <li className="mb-2">
                 <span className="font-semibold text-red-500">Health:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips.health}
+                  {overview.safety_tips?.health}
                 </span>
               </li>
               <li className="mb-2">
@@ -307,7 +307,7 @@ const DestinationPage: React.FC = () => {
                 </span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips.emergency_numbers}
+                  {overview.safety_tips?.emergency_numbers}
                 </span>
               </li>
             </ul>
@@ -319,7 +319,7 @@ const DestinationPage: React.FC = () => {
               Transportation
             </h2>
             <ul className="list-disc list-inside">
-              {overview.transportation.options.map((option, index) => (
+              {overview.transportation.options?.map((option, index) => (
                 <li key={index} className="mb-2">
                   <span className="font-semibold text-purple-500">
                     {option.mode}:
@@ -339,7 +339,7 @@ const DestinationPage: React.FC = () => {
               Popular Landmarks
             </h3>
             <ul className="list-disc list-inside">
-              {overview.landmarks_and_attractions.popular_landmarks.map(
+              {overview.landmarks_and_attractions.popular_landmarks?.map(
                 (landmark, index) => (
                   <li key={index} className="mb-2">
                     <span className="font-semibold text-indigo-400">
@@ -357,7 +357,7 @@ const DestinationPage: React.FC = () => {
               Other Attractions
             </h3>
             <ul className="list-disc list-inside">
-              {overview.landmarks_and_attractions.other_attractions.map(
+              {overview.landmarks_and_attractions.other_attractions?.map(
                 (attraction, index) => (
                   <li key={index} className="mb-2">
                     <span className="font-semibold text-indigo-400">
@@ -382,7 +382,7 @@ const DestinationPage: React.FC = () => {
               Unique Activities
             </h3>
             <ul className="list-disc list-inside">
-              {overview.cultural_experiences.unique_activities.map(
+              {overview.cultural_experiences.unique_activities?.map(
                 (activity, index) => (
                   <li key={index} className="mb-2">
                     <span className="font-semibold text-teal-400">
@@ -400,7 +400,7 @@ const DestinationPage: React.FC = () => {
               Events and Festivals
             </h3>
             <ul className="list-disc list-inside">
-              {overview.cultural_experiences.events_and_festivals.map(
+              {overview.cultural_experiences.events_and_festivals?.map(
                 (event, index) => (
                   <li key={index} className="mb-2">
                     <span className="font-semibold text-teal-400">
@@ -419,7 +419,7 @@ const DestinationPage: React.FC = () => {
               Day Trips and Excursions
             </h2>
             <ul className="list-disc list-inside">
-              {overview.day_trips_and_excursions.destinations.map(
+              {overview.day_trips_and_excursions.destinations?.map(
                 (destination, index) => (
                   <li key={index} className="mb-2">
                     <span className="font-semibold text-gray-600">
@@ -438,7 +438,7 @@ const DestinationPage: React.FC = () => {
       </div>
 
       <div className="p-8 bg-gray-100">
-        {error && MessageBox({ type: "error", message: error })}
+        {/* {error && MessageBox({ type: "error", message: error })} */}
         <div className="grid grid-cols-12 gap-4">
           {images.slice(0, 9).map((image, index) => (
             <div
