@@ -65,6 +65,7 @@ function CustomCarousel({ items }: { items: any[] }) {
 function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [itinerariesArray, setItinerariesArray] = useState<any[]>([]);
+  console.log(user);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {

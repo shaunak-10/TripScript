@@ -125,7 +125,7 @@ export default function TripPreferences() {
         <Input
           type="number"
           id="budget"
-          label="budget"
+          label="Total budget"
           value={budget}
           onChange={(e) => setBudget(e.target.value)}
         />
