@@ -2,7 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { auth, db } from "@/firebase";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 import {
   Card,
   CardHeader,
@@ -12,7 +19,15 @@ import {
   Button,
   Accordion,
   AccordionItem,
+  Link,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  useDisclosure,
 } from "@nextui-org/react";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function CustomCarousel({ items }: { items: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -65,7 +80,8 @@ function CustomCarousel({ items }: { items: any[] }) {
 function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [itinerariesArray, setItinerariesArray] = useState<any[]>([]);
-  console.log(user);
+  console.log(user?.photoURL);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -103,12 +119,24 @@ function ProfilePage() {
       itineraries.forEach((doc) => {
         setItinerariesArray((prevItineraries) => [
           ...prevItineraries,
-          doc.data().trip,
+          { trip: doc.data().trip, id: doc.id },
         ]);
       });
     }
   };
 
+  const deleteItinerary = async (id: string) => {
+    try {
+      setItinerariesArray((prevItineraries) =>
+        prevItineraries.filter((itinerary) => itinerary.id !== id)
+      );
+      const itinerariesRef = collection(db, "itineraries");
+      const docRef = doc(itinerariesRef, id);
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error("Error deleting itinerary:", error);
+    }
+  };
   return (
     <div className="bg-gray-100 min-h-screen p-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -159,16 +187,17 @@ function ProfilePage() {
           <h2 className="text-2xl font-bold mb-4">Your Itineraries</h2>
           {itinerariesArray.length > 0 ? (
             <Accordion variant="shadow">
-              {itinerariesArray.map((itinerary, index) => (
+              {itinerariesArray.map((itinerary) => (
                 <AccordionItem
-                  key={index}
-                  aria-label={itinerary.trip_name}
+                  key={itinerary.id}
+                  aria-label={itinerary.trip.trip_name}
                   title={
-                    <div className="flex items-center gap-2">
-                      {/* <MapPin className="text-primary" size={20} /> */}
-                      <span className="font-semibold">
-                        {itinerary.trip_name}
-                      </span>
+                    <div className="flex items-center justify-between gap-2 w-full">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">
+                          {itinerary.trip.trip_name}
+                        </span>
+                      </div>
                     </div>
                   }
                   subtitle={
@@ -176,13 +205,13 @@ function ProfilePage() {
                       <div className="flex items-center gap-1">
                         {/* <Calendar size={16} className="text-default-400" /> */}
                         <span className="text-sm text-default-400">
-                          {itinerary.itinerary.length} days
+                          {itinerary.trip.itinerary.length} days
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
                         {/* <DollarSign size={16} className="text-default-400" /> */}
                         <span className="text-sm text-default-400">
-                          {itinerary.budget} {itinerary.currency}
+                          {itinerary.trip.budget} {itinerary.trip.currency}
                         </span>
                       </div>
                     </div>
@@ -190,7 +219,7 @@ function ProfilePage() {
                 >
                   <div>
                     <CustomCarousel
-                      items={itinerary.itinerary.map(
+                      items={itinerary.trip.itinerary.map(
                         (day: any, dayIndex: number) => (
                           <Card
                             key={dayIndex}
@@ -235,6 +264,39 @@ function ProfilePage() {
                         )
                       )}
                     />
+                    <div className="flex justify-end">
+                      <Link onPress={onOpen}>
+                        <DeleteIcon className="text-red-500 cursor-pointer" />
+                      </Link>
+                      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                        <ModalContent>
+                          {(onClose) => (
+                            <>
+                              <ModalHeader className="flex flex-col gap-1">
+                                {itinerary.trip.trip_name}
+                              </ModalHeader>
+                              <ModalBody>
+                                <p>
+                                  Are you sure you want to delete this
+                                  itinerary?
+                                </p>
+                              </ModalBody>
+                              <ModalFooter>
+                                <Button
+                                  color="danger"
+                                  onPress={() => {
+                                    deleteItinerary(itinerary.id);
+                                    onClose();
+                                  }}
+                                >
+                                  Delete Itinerary
+                                </Button>
+                              </ModalFooter>
+                            </>
+                          )}
+                        </ModalContent>
+                      </Modal>
+                    </div>
                   </div>
                 </AccordionItem>
               ))}
