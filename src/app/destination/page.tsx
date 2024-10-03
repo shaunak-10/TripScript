@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import DestinationLoading from "./loading";
 import MessageBox from "@/components/messagebox";
+import React from "react";
+import Loading from "../destination/loading";
 
 interface UnsplashImage {
   id: string;
@@ -77,47 +79,26 @@ const DestinationPage: React.FC = () => {
   const [images, setImages] = useState<UnsplashImage[]>([]);
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
-  const city: string = JSON.stringify(searchParams.get("city"));
+  const city = useMemo(() => searchParams.get("city") || "", [searchParams]);
 
   const accessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
 
+  const generateQuery = useCallback((city: string) => {
+    const touristKeywords = [
+      "landmarks",
+      "attractions",
+      "sightseeing",
+      "tourism",
+      "travel destination",
+    ];
+    const randomKeyword =
+      touristKeywords[Math.floor(Math.random() * touristKeywords.length)];
+    return `${city} ${randomKeyword}`;
+  }, []);
+
   useEffect(() => {
-    const fetchOverview = async () => {
-      try {
-        const response = await fetch("/api/destination-discovery", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            city,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch overview");
-        }
-
-        const data: Overview = await response.json();
-        setOverview(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      }
-    };
-    const generateQuery = (city: string) => {
-      const touristKeywords = [
-        "landmarks",
-        "attractions",
-        "sightseeing",
-        "tourism",
-        "travel destination",
-      ];
-      const randomKeyword =
-        touristKeywords[Math.floor(Math.random() * touristKeywords.length)];
-      return `${city} ${randomKeyword}`;
-    };
+    console.log("Called");
     const fetchImages = async () => {
-      setLoading(true);
       try {
         const query = generateQuery(city);
         const response = await fetch(
@@ -140,18 +121,51 @@ const DestinationPage: React.FC = () => {
       } catch (error) {
         console.log("Error fetching images:", error);
         setError("Error fetching images");
-      } finally {
-        setLoading(false);
       }
     };
-    setLoading(true);
-    fetchImages();
-    fetchOverview();
-    setLoading(false);
-  }, [city]);
 
-  if (!overview || !images) {
-    return DestinationLoading();
+    const fetchOverview = async () => {
+      try {
+        const response = await fetch("/api/destination-discovery", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            city,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch overview");
+        }
+
+        const data = await response.json();
+        console.log(data.overview);
+        setOverview(data.overview);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      }
+    };
+
+    const fetchData = async () => {
+      setLoading(true);
+      await Promise.all([fetchImages(), fetchOverview()]);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [city, accessKey, generateQuery]);
+
+  if (loading) {
+    return <DestinationLoading />;
+  }
+
+  if (error) {
+    return <MessageBox type="error" message={error} />;
+  }
+  if (!overview || images.length === 0) {
+    return Loading();
   }
 
   return (
@@ -160,8 +174,6 @@ const DestinationPage: React.FC = () => {
         <h1 className="text-5xl font-extrabold text-center mb-12 text-blue-800 tracking-tight">
           Discover {overview.city}
         </h1>
-        {loading && <p>Loading images...</p>}
-        {/* {error && <MessageBox type="error" message={error} />} */}
         <div className="grid grid-cols-12 gap-4">
           {images.slice(0, 3).map((image, index) => (
             <div
@@ -206,7 +218,7 @@ const DestinationPage: React.FC = () => {
               {overview.best_time_to_visit.description}
             </p>
             <ul className="list-disc list-inside">
-              {overview?.best_time_to_visit.seasons?.map((season, index) => (
+              {overview.best_time_to_visit.seasons?.map((season, index) => (
                 <li key={index} className="mb-3">
                   <span className="font-semibold text-blue-500">
                     {season.season}:
@@ -227,14 +239,14 @@ const DestinationPage: React.FC = () => {
                 <span className="font-semibold text-green-500">Greetings:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview?.local_customs_and_culture.greetings}
+                  {overview.local_customs_and_culture.greetings}
                 </span>
               </li>
               <li className="mb-2">
                 <span className="font-semibold text-green-500">Etiquette:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.local_customs_and_culture?.etiquette}
+                  {overview.local_customs_and_culture.etiquette}
                 </span>
               </li>
               <li className="mb-2">
@@ -243,7 +255,7 @@ const DestinationPage: React.FC = () => {
                 </span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.local_customs_and_culture?.dress_code}
+                  {overview.local_customs_and_culture.dress_code}
                 </span>
               </li>
               <li className="mb-2">
@@ -252,7 +264,7 @@ const DestinationPage: React.FC = () => {
                 </span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.local_customs_and_culture?.food_and_drink}
+                  {overview.local_customs_and_culture.food_and_drink}
                 </span>
               </li>
               <li className="mb-2">
@@ -261,7 +273,7 @@ const DestinationPage: React.FC = () => {
                 </span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.local_customs_and_culture?.religious_practices}
+                  {overview.local_customs_and_culture.religious_practices}
                 </span>
               </li>
             </ul>
@@ -277,28 +289,28 @@ const DestinationPage: React.FC = () => {
                 <span className="font-semibold text-red-500">General:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips?.general}
+                  {overview.safety_tips.general}
                 </span>
               </li>
               <li className="mb-2">
                 <span className="font-semibold text-red-500">Crime:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips?.crime}
+                  {overview.safety_tips.crime}
                 </span>
               </li>
               <li className="mb-2">
                 <span className="font-semibold text-red-500">Traffic:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips?.traffic}
+                  {overview.safety_tips.traffic}
                 </span>
               </li>
               <li className="mb-2">
                 <span className="font-semibold text-red-500">Health:</span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips?.health}
+                  {overview.safety_tips.health}
                 </span>
               </li>
               <li className="mb-2">
@@ -307,7 +319,7 @@ const DestinationPage: React.FC = () => {
                 </span>
                 <span className="text-gray-600">
                   {" "}
-                  {overview.safety_tips?.emergency_numbers}
+                  {overview.safety_tips.emergency_numbers}
                 </span>
               </li>
             </ul>
