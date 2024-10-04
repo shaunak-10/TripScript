@@ -9,6 +9,7 @@ import {
   getDocs,
   doc,
   deleteDoc,
+  addDoc,
 } from "firebase/firestore";
 import {
   Card,
@@ -27,7 +28,6 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 function CustomCarousel({ items }: { items: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -80,7 +80,8 @@ function CustomCarousel({ items }: { items: any[] }) {
 function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [itinerariesArray, setItinerariesArray] = useState<any[]>([]);
-  console.log(user?.photoURL);
+  const [wishlist, setWishlist] = useState<string[]>([]);
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
@@ -88,13 +89,18 @@ function ProfilePage() {
       if (currentUser) {
         setUser(currentUser);
       }
+      if (!currentUser) {
+        setUser(null);
+      }
     });
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (user) {
+      console.log(user?.photoURL);
       getItineraries();
+      checkAndCreateWishlist();
     }
   }, [user]);
 
@@ -104,6 +110,33 @@ function ProfilePage() {
       setUser(null);
     } catch (error) {
       console.error("Sign out error:", error);
+    }
+  };
+
+  const checkAndCreateWishlist = async () => {
+    const WishlistRef = collection(db, "favourites");
+    const Wishlist = await getDocs(
+      query(WishlistRef, where("userId", "==", user?.uid))
+    );
+    if (Wishlist.empty) {
+      try {
+        const docRef = await addDoc(collection(db, "favourites"), {
+          wishlist: [],
+          userId: user?.uid,
+        });
+        console.log("Document written with ID: ", docRef.id);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error("Error adding document: ", error.message);
+        }
+      }
+    } else {
+      const WishlistRef = collection(db, "favourites");
+      const Wishlist = await getDocs(
+        query(WishlistRef, where("userId", "==", user?.uid))
+      );
+      const list = Wishlist.docs[0].data().wishlist;
+      setWishlist(list);
     }
   };
 
@@ -143,36 +176,72 @@ function ProfilePage() {
         <div className="md:col-span-1">
           {user ? (
             user.emailVerified ? (
-              <Card className="w-full border border-default-200 shadow-md">
-                <CardHeader className="justify-center pb-0">
-                  <div className="flex flex-col items-center gap-3">
-                    <Avatar
-                      isBordered
-                      radius="full"
-                      className="w-30 h-30"
-                      src={user?.photoURL || "https://via.placeholder.com/150"}
-                    />
-                    <div className="flex flex-col items-center">
-                      <h4 className="text-xl font-bold text-default-900">
-                        {user?.displayName || "User Name"}
-                      </h4>
-                      <h5 className="text-sm text-default-500">
-                        {user?.email || "user@example.com"}
-                      </h5>
+              <>
+                <Card className="w-full border border-default-200 shadow-md">
+                  <CardHeader className="justify-center pb-0">
+                    <div className="flex flex-col items-center gap-3">
+                      <Avatar
+                        isBordered
+                        radius="full"
+                        className="w-30 h-30"
+                        src={
+                          user?.photoURL || "https://via.placeholder.com/150"
+                        }
+                      />
+                      <div className="flex flex-col items-center">
+                        <h4 className="text-xl font-bold text-default-900">
+                          {user?.displayName || "User Name"}
+                        </h4>
+                        <h5 className="text-sm text-default-500">
+                          {user?.email || "user@example.com"}
+                        </h5>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardFooter className="justify-center pt-5">
-                  <Button
-                    color="danger"
-                    variant="flat"
-                    className="w-full"
-                    onClick={handleSignOut}
-                  >
-                    Sign Out
-                  </Button>
-                </CardFooter>
-              </Card>
+                  </CardHeader>
+                  <CardFooter className="justify-center pt-5">
+                    <Button
+                      color="danger"
+                      variant="flat"
+                      className="w-full"
+                      onClick={handleSignOut}
+                    >
+                      Sign Out
+                    </Button>
+                  </CardFooter>
+                </Card>
+                <Card className="w-full border border-blue-200 shadow-lg my-4 bg-gradient-to-r from-blue-50 to-green-50">
+                  <CardHeader className="justify-center pb-2 pt-6 bg-gradient-to-r from-blue-400 to-blue-600">
+                    <div className="flex flex-col items-center">
+                      <h4 className="text-2xl font-bold text-white">
+                        Your Wishlist
+                      </h4>
+                    </div>
+                  </CardHeader>
+                  <CardBody className="px-4 py-5">
+                    <div className="flex flex-col items-center max-h-[250px] min-h-[250px] overflow-auto pr-2">
+                      {wishlist.length === 0 ? (
+                        <p className="text-gray-500 text-lg font-medium text-center mt-8">
+                          Select the heart icon on a destination to add it to
+                          your wishlist.
+                        </p>
+                      ) : (
+                        <ul className="flex flex-col gap-3 w-full">
+                          {wishlist.map((item, index) => (
+                            <Link href={`/destination?city=${item}`}>
+                              <li
+                                key={item}
+                                className="flex items-center justify-between w-full p-3 bg-white rounded-lg shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+                              >
+                                <span className="text-blue-800">{item}</span>
+                              </li>
+                            </Link>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </CardBody>
+                </Card>
+              </>
             ) : (
               <p className="text-lg font-medium">Email not verified</p>
             )
@@ -185,7 +254,7 @@ function ProfilePage() {
 
         <div className="md:col-span-2">
           <h2 className="text-2xl font-bold mb-4">Your Itineraries</h2>
-          {itinerariesArray.length > 0 ? (
+          {itinerariesArray.length > 0 && user ? (
             <Accordion variant="shadow">
               {itinerariesArray.map((itinerary) => (
                 <AccordionItem
@@ -223,14 +292,14 @@ function ProfilePage() {
                         (day: any, dayIndex: number) => (
                           <Card
                             key={dayIndex}
-                            className="w-full h-[400px] shadow-md"
+                            className="w-full h-[400px] shadow-md border border-blue-200 shadow-lg my-4 bg-gradient-to-r from-blue-50 to-green-50"
                           >
-                            <CardHeader className="bg-primary-50">
-                              <h3 className="text-lg font-semibold">
+                            <CardHeader className="bg-gradient-to-r from-blue-400 to-blue-600">
+                              <h3 className="text-lg text-white font-semibold">
                                 Day {day.day}: {day.theme}
                               </h3>
                             </CardHeader>
-                            <CardBody className="overflow-y-auto">
+                            <CardBody className="overflow-y-auto ">
                               <div className="space-y-3">
                                 {day.activities.map(
                                   (activity: any, actIndex: number) => (
@@ -265,9 +334,9 @@ function ProfilePage() {
                       )}
                     />
                     <div className="flex justify-end">
-                      <Link onPress={onOpen}>
-                        <DeleteIcon className="text-red-500 cursor-pointer" />
-                      </Link>
+                      <Button color="danger" onPress={onOpen}>
+                        Delete Itinerary
+                      </Button>
                       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                         <ModalContent>
                           {(onClose) => (

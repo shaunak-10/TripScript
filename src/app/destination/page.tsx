@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import DestinationLoading from "./loading";
 import MessageBox from "@/components/messagebox";
-import React from "react";
 import Loading from "../destination/loading";
+import WishlistHeart from "@/components/wishlistHeart";
 
 interface UnsplashImage {
   id: string;
@@ -97,7 +97,6 @@ const DestinationPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Called");
     const fetchImages = async () => {
       try {
         const query = generateQuery(city);
@@ -141,7 +140,6 @@ const DestinationPage: React.FC = () => {
         }
 
         const data = await response.json();
-        console.log(data.overview);
         setOverview(data.overview);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -171,9 +169,14 @@ const DestinationPage: React.FC = () => {
   return (
     <>
       <div className="p-8 bg-gray-100">
-        <h1 className="text-5xl font-extrabold text-center mb-12 text-blue-800 tracking-tight">
-          Discover {overview.city}
-        </h1>
+        <div className="p-8 bg-gray-100 flex  items-center justify-between">
+          <h1 className="text-5xl font-extrabold text-center text-blue-800 tracking-tight">
+            Discover {overview.city}
+          </h1>
+          <div className="flex justify-center items-center">
+            <WishlistHeart city={overview.city} />
+          </div>
+        </div>
         <div className="grid grid-cols-12 gap-4">
           {images.slice(0, 3).map((image, index) => (
             <div
