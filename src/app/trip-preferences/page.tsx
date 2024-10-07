@@ -3,6 +3,7 @@
 import { Input, Button, Select, SelectItem } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import MessageBox from "@/components/messagebox";
 
 const themes = [
   {
@@ -82,15 +83,20 @@ export default function TripPreferences() {
   const [theme, setTheme] = useState("");
   const [buttonLoading, setButtonLoading] = useState(false);
   const [people, setPeople] = useState(1);
+  const [error, setError] = useState<string | null>(null);
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setButtonLoading(true);
     console.log("Form submitted:", { destination, days, budget, theme });
+    if (!destination || !days || !budget || !theme) {
+      setButtonLoading(false);
+      setError("Please fill all the fields");
+      return;
+    }
     //Now navigate to /your-trip with all data
     router.push(
       `/your-trip?destination=${destination}&days=${days}&budget=${budget}&theme=${theme}&people=${people}`
     );
-    setButtonLoading(false);
   }
   return (
     <div className="flex flex-col items-center min-h-screen py-12 px-4">
@@ -146,6 +152,11 @@ export default function TripPreferences() {
             <SelectItem key={theme.key}>{theme.label}</SelectItem>
           ))}
         </Select>
+        {error && (
+          <div className="m-y-4">
+            <MessageBox type="error" message={error} />
+          </div>
+        )}
         <Button
           type="submit"
           className="w-full inline-flex items-center px-4 py-2"

@@ -20,6 +20,7 @@ export interface Trip {
   budget: number;
   currency: string;
   itinerary: Day[];
+  itineraryCreationErr?: string;
 }
 
 const Itinerary = ({ trip }: { trip: Trip }) => {

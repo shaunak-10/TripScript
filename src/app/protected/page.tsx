@@ -28,6 +28,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
+import MessageBox from "@/components/messagebox";
 
 function CustomCarousel({ items }: { items: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -81,6 +82,7 @@ function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [itinerariesArray, setItinerariesArray] = useState<any[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -109,7 +111,7 @@ function ProfilePage() {
       await signOut(auth);
       setUser(null);
     } catch (error) {
-      console.error("Sign out error:", error);
+      setError("Failed to sign out");
     }
   };
 
@@ -126,35 +128,41 @@ function ProfilePage() {
         });
         console.log("Document written with ID: ", docRef.id);
       } catch (error) {
-        if (error instanceof Error) {
-          console.error("Error adding document: ", error.message);
-        }
+        setError("Failed to create wishlist");
       }
     } else {
       const WishlistRef = collection(db, "favourites");
-      const Wishlist = await getDocs(
-        query(WishlistRef, where("userId", "==", user?.uid))
-      );
-      const list = Wishlist.docs[0].data().wishlist;
-      setWishlist(list);
+      try {
+        const Wishlist = await getDocs(
+          query(WishlistRef, where("userId", "==", user?.uid))
+        );
+        const list = Wishlist.docs[0].data().wishlist;
+        setWishlist(list);
+      } catch (error) {
+        setError("Failed to fetch wishlist");
+      }
     }
   };
 
   const getItineraries = async () => {
-    setItinerariesArray([]);
-    const itinerariesRef = collection(db, "itineraries");
-    const itineraries = await getDocs(
-      query(itinerariesRef, where("userId", "==", user?.uid))
-    );
-    if (itineraries.empty) {
-      console.log("No itineraries found");
-    } else {
-      itineraries.forEach((doc) => {
-        setItinerariesArray((prevItineraries) => [
-          ...prevItineraries,
-          { trip: doc.data().trip, id: doc.id },
-        ]);
-      });
+    try {
+      setItinerariesArray([]);
+      const itinerariesRef = collection(db, "itineraries");
+      const itineraries = await getDocs(
+        query(itinerariesRef, where("userId", "==", user?.uid))
+      );
+      if (itineraries.empty) {
+        console.log("No itineraries found");
+      } else {
+        itineraries.forEach((doc) => {
+          setItinerariesArray((prevItineraries) => [
+            ...prevItineraries,
+            { trip: doc.data().trip, id: doc.id },
+          ]);
+        });
+      }
+    } catch (error) {
+      setError("Failed to fetch itineraries");
     }
   };
 
@@ -167,11 +175,16 @@ function ProfilePage() {
       const docRef = doc(itinerariesRef, id);
       await deleteDoc(docRef);
     } catch (error) {
-      console.error("Error deleting itinerary:", error);
+      setError("Failed to delete itinerary");
     }
   };
   return (
     <div className="bg-gray-100 min-h-screen p-8">
+      {error && (
+        <div className="mb-8">
+          <MessageBox message={error} type="error" />
+        </div>
+      )}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1">
           {user ? (
@@ -227,7 +240,7 @@ function ProfilePage() {
                       ) : (
                         <ul className="flex flex-col gap-3 w-full">
                           {wishlist.map((item, index) => (
-                            <Link href={`/destination?city=${item}`}>
+                            <Link key={item} href={`/destination?city=${item}`}>
                               <li
                                 key={item}
                                 className="flex items-center justify-between w-full p-3 bg-white rounded-lg shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"

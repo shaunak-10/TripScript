@@ -118,7 +118,6 @@ const DestinationPage: React.FC = () => {
         const data = await response.json();
         setImages(data.results);
       } catch (error) {
-        console.log("Error fetching images:", error);
         setError("Error fetching images");
       }
     };
@@ -165,7 +164,6 @@ const DestinationPage: React.FC = () => {
   if (!overview || images.length === 0) {
     return Loading();
   }
-
   return (
     <>
       <div className="p-8 bg-gray-100">
@@ -453,7 +451,6 @@ const DestinationPage: React.FC = () => {
       </div>
 
       <div className="p-8 bg-gray-100">
-        {/* {error && MessageBox({ type: "error", message: error })} */}
         <div className="grid grid-cols-12 gap-4">
           {images.slice(0, 9).map((image, index) => (
             <div

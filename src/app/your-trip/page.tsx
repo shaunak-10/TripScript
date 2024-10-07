@@ -44,13 +44,17 @@ export default function YourTrip({
         });
 
         if (!response.ok) {
-          setError("Failed to fetch itinerary");
+          throw new Error("Failed to fetch itinerary");
         }
 
         const data: Trip = await response.json();
         setTrip(data);
+        if (data.itineraryCreationErr) {
+          setError(data.itineraryCreationErr);
+          return;
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        setError("Failed to fetch itinerary");
       }
     };
     fetchItinerary();
@@ -67,7 +71,8 @@ export default function YourTrip({
     setIsSaving(true);
     if (!user) {
       setError("You must be logged in to save an itinerary.");
-      router.push("/login");
+      setIsSaving(false);
+      return;
     }
     try {
       const docRef = await addDoc(collection(db, "itineraries"), {
@@ -78,9 +83,6 @@ export default function YourTrip({
       router.push("/protected");
     } catch (error) {
       setError("Failed to save itinerary");
-      if (error instanceof Error) {
-        console.error("Error adding document: ", error.message);
-      }
     }
   }
 
