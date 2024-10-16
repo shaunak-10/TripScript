@@ -305,7 +305,7 @@ function ProfilePage() {
                         (day: any, dayIndex: number) => (
                           <Card
                             key={dayIndex}
-                            className="w-full h-[400px] shadow-md border border-blue-200 shadow-lg my-4 bg-gradient-to-r from-blue-50 to-green-50"
+                            className="w-full h-[400px]  border border-blue-200 shadow-lg my-4 bg-gradient-to-r from-blue-50 to-green-50"
                           >
                             <CardHeader className="bg-gradient-to-r from-blue-400 to-blue-600">
                               <h3 className="text-lg text-white font-semibold">
