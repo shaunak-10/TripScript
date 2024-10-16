@@ -7,6 +7,22 @@ import DestinationLoading from "./loading";
 import MessageBox from "@/components/messagebox";
 import Loading from "../destination/loading";
 import WishlistHeart from "@/components/wishlistHeart";
+import dynamic from "next/dynamic";
+import { Config, Data, Layout } from "plotly.js";
+
+const Plot = dynamic(() => import("react-plotly.js"));
+
+interface WeatherData {
+  temperature: number;
+  description: string;
+  icon: string;
+}
+
+interface FutureWeather {
+  temperature: number[][];
+  sunshine: number[];
+  daylight: number[];
+}
 
 interface UnsplashImage {
   id: string;
@@ -72,16 +88,25 @@ interface Overview {
     }[];
   };
 }
+interface RainfallData {
+  rainfall: number[];
+}
 
 const DestinationPage: React.FC = () => {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [images, setImages] = useState<UnsplashImage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [rainfallData, setRainfallData] = useState<RainfallData | null>(null);
+  const [futureWeather, setFutureWeather] = useState<FutureWeather | null>(
+    null
+  );
   const searchParams = useSearchParams();
   const city = useMemo(() => searchParams.get("city") || "", [searchParams]);
 
   const accessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
+  const openWeatherApiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
 
   const generateQuery = useCallback((city: string) => {
     const touristKeywords = [
@@ -145,14 +170,92 @@ const DestinationPage: React.FC = () => {
       }
     };
 
+    const fetchWeather = async () => {
+      try {
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${openWeatherApiKey}&units=metric`
+        );
+        if (!response.ok) throw new Error("Failed to fetch weather data");
+        const data = await response.json();
+        setWeather({
+          temperature: data.main.temp,
+          description: data.weather[0].description,
+          icon: data.weather[0].icon,
+        });
+      } catch (err) {
+        setError("Error fetching weather data");
+      }
+    };
+
+    const fetchFutureWeather = async () => {
+      try {
+        const currentDate = new Date();
+        const startDate = Math.floor(
+          (currentDate.getTime() - new Date("2024-07-01").getTime()) /
+            (1000 * 60 * 60 * 24)
+        );
+        const endDate = startDate + 10;
+
+        const response = await fetch("http://127.0.0.1:8000/api/temperature/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            city: "bharuch",
+            start_date: startDate,
+            end_date: endDate,
+          }),
+        });
+
+        if (!response.ok)
+          throw new Error("Failed to fetch future weather data");
+        const data = await response.json();
+        setFutureWeather(data);
+      } catch (err) {
+        setError("Error fetching future weather data");
+      }
+    };
+
+    const fetchRainfallData = async () => {
+      const currentDate = new Date();
+      const startDate = Math.floor(
+        (currentDate.getTime() - new Date("2024-07-01").getTime()) /
+          (1000 * 60 * 60 * 24)
+      );
+      const endDate = startDate + 10;
+      try {
+        const response = await fetch("http://localhost:8000/api/rain/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            city: "bharuch",
+            start_date: startDate,
+            end_date: endDate,
+          }),
+        });
+        console.log(response);
+        if (!response.ok) throw new Error("Failed to fetch rainfall data");
+        const data = await response.json();
+        console.log(data);
+        setRainfallData(data);
+      } catch (err) {
+        setError("Error fetching rainfall data");
+      }
+    };
+
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([fetchImages(), fetchOverview()]);
+      await Promise.all([
+        fetchImages(),
+        fetchOverview(),
+        fetchFutureWeather(),
+        fetchRainfallData(),
+        fetchWeather(),
+      ]);
       setLoading(false);
     };
 
     fetchData();
-  }, [city, accessKey, generateQuery]);
+  }, [city, accessKey, generateQuery, openWeatherApiKey]);
 
   if (loading) {
     return <DestinationLoading />;
@@ -161,9 +264,131 @@ const DestinationPage: React.FC = () => {
   if (error) {
     return <MessageBox type="error" message={error} />;
   }
-  if (!overview || images.length === 0) {
-    return Loading();
+
+  if (
+    !overview ||
+    images.length === 0 ||
+    !weather ||
+    !futureWeather ||
+    !rainfallData
+  ) {
+    return <Loading />;
   }
+
+  const renderWeatherSection = () => {
+    const dates = Array.from({ length: 11 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    });
+
+    const temperatureData: Data = {
+      x: dates,
+      y: futureWeather.temperature.map((t) => t[1]),
+      type: "scatter",
+      mode: "lines+markers",
+      name: "Max Temperature",
+      line: { color: "rgb(255, 99, 132)" },
+    };
+
+    const minTemperatureData: Data = {
+      x: dates,
+      y: futureWeather.temperature.map((t) => t[0]),
+      type: "scatter",
+      mode: "lines+markers",
+      name: "Min Temperature",
+      line: { color: "rgb(75, 192, 192)" },
+    };
+
+    const layout: Partial<Layout> = {
+      title: "Temperature Forecast",
+      xaxis: { title: "Date" },
+      yaxis: { title: "Temperature (°C)" },
+      autosize: true,
+      height: 300,
+      margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
+    };
+
+    const config: Partial<Config> = { responsive: true };
+
+    return (
+      <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 className="text-2xl font-semibold mb-4 text-blue-600">
+          Weather Forecast
+        </h2>
+        <div className="flex items-center mb-4">
+          <Image
+            src={`http://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+            alt={weather.description}
+            width={50}
+            height={50}
+          />
+          <div className="ml-4">
+            <p className="text-3xl font-bold">
+              {Math.round(weather.temperature)}°C
+            </p>
+            <p className="text-gray-600 capitalize">{weather.description}</p>
+          </div>
+        </div>
+        <div className="mt-8">
+          <Plot
+            data={[temperatureData, minTemperatureData]}
+            layout={layout}
+            config={config}
+            style={{ width: "100%" }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const renderRainfallSection = () => {
+    const dates = Array.from({ length: 11 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    });
+
+    const rainfallChartData: Data = {
+      x: dates,
+      y: rainfallData.rainfall,
+      type: "bar",
+      name: "Rainfall",
+      text: rainfallData.rainfall.map((r) => `${r.toFixed(2)} mm`),
+      marker: { color: "rgb(0, 123, 255)" },
+    };
+
+    const layout: Partial<Layout> = {
+      title: "Rainfall Forecast",
+      xaxis: { title: "Date" },
+      yaxis: { title: "Rainfall (mm)" },
+      autosize: true,
+      height: 400,
+      margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
+    };
+
+    const config: Partial<Config> = { responsive: true };
+
+    return (
+      <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 className="text-2xl font-semibold mb-4 text-blue-600">
+          Rainfall Forecast
+        </h2>
+        <Plot
+          data={[rainfallChartData]}
+          layout={layout}
+          config={config}
+          style={{ width: "100%" }}
+        />
+      </div>
+    );
+  };
   return (
     <>
       <div className="p-8 bg-gray-100">
@@ -209,6 +434,8 @@ const DestinationPage: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {renderWeatherSection()}
+        {renderRainfallSection()}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Best Time to Visit */}
           <div className="bg-blue-50 shadow-lg rounded-lg p-6">
