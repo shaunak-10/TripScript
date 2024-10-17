@@ -9,6 +9,7 @@ import Loading from "../destination/loading";
 import WishlistHeart from "@/components/wishlistHeart";
 import dynamic from "next/dynamic";
 import { Config, Data, Layout } from "plotly.js";
+import { Map } from "@/components/map";
 
 const Plot = dynamic(() => import("react-plotly.js"));
 
@@ -308,8 +309,15 @@ const DestinationPage: React.FC = () => {
       xaxis: { title: "Date" },
       yaxis: { title: "Temperature (°C)" },
       autosize: true,
-      height: 300,
-      margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
+      height: 308,
+      margin: { l: 50, r: 50, b: 50, t: 80, pad: 4 },
+      legend: {
+        orientation: "h",
+        yanchor: "bottom",
+        y: 1.02,
+        xanchor: "right",
+        x: 1,
+      },
     };
 
     const config: Partial<Config> = { responsive: true };
@@ -434,8 +442,13 @@ const DestinationPage: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {renderWeatherSection()}
-        {renderRainfallSection()}
+        <div className="flex w-full gap-4">
+          <div className="w-1/2">{renderWeatherSection()}</div>
+          <div className="w-1/2">{renderRainfallSection()}</div>
+        </div>
+        <div className="w-full">
+          <Map city={overview.city} />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Best Time to Visit */}
           <div className="bg-blue-50 shadow-lg rounded-lg p-6">
